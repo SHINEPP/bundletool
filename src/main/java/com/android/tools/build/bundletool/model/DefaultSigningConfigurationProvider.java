@@ -41,7 +41,7 @@ public class DefaultSigningConfigurationProvider implements SigningConfiguration
     ApksigSigningConfiguration.Builder apksigSigningConfig =
         ApksigSigningConfiguration.builder()
             .setSignerConfigs(getSignerConfigs(apkDescription))
-            .setV1SigningEnabled(shouldSignWithV1(apkDescription))
+            .setV1SigningEnabled(true/*shouldSignWithV1(apkDescription)*/)
             .setV2SigningEnabled(true)
             .setV3SigningEnabled(true);
     getSigningCertificateLineage(apkDescription)

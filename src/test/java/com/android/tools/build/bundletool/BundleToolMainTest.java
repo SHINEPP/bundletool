@@ -35,13 +35,14 @@ public final class BundleToolMainTest {
     MockitoAnnotations.initMocks(this);
   }
 
-  @Mock private Runtime mockRuntime;
+  @Mock
+  private Runtime mockRuntime;
 
   private final ArgumentCaptor<Integer> exitCode = ArgumentCaptor.forClass(Integer.class);
 
   @Test
   public void testNoErrorReturnsExitCodeZero() {
-    BundleToolMain.main(new String[] {"help", "build-apks"}, mockRuntime);
+    BundleToolMain.main(new String[]{"help", "build-apks"}, mockRuntime);
 
     // Exit code 0 is returned by explicitly invoking Runtime#exit.
     verify(mockRuntime).exit(exitCode.capture());
@@ -50,7 +51,7 @@ public final class BundleToolMainTest {
 
   @Test
   public void testErrorReturnsExitCodeNotZero_badFlag() {
-    BundleToolMain.main(new String[] {"build-apks", "not-a-flag"}, mockRuntime);
+    BundleToolMain.main(new String[]{"build-apks", "not-a-flag"}, mockRuntime);
 
     verify(mockRuntime).exit(exitCode.capture());
     assertThat(exitCode.getValue()).isNotEqualTo(0);
@@ -58,7 +59,7 @@ public final class BundleToolMainTest {
 
   @Test
   public void testErrorReturnsExitCodeNotZero_noCommand() {
-    BundleToolMain.main(new String[] {""}, mockRuntime);
+    BundleToolMain.main(new String[]{""}, mockRuntime);
 
     verify(mockRuntime).exit(exitCode.capture());
     assertThat(exitCode.getValue()).isNotEqualTo(0);
@@ -66,7 +67,7 @@ public final class BundleToolMainTest {
 
   @Test
   public void testErrorReturnsExitCodeNotZero_helpForUnrecognizedCommand() {
-    BundleToolMain.main(new String[] {"help", "not-a-command"}, mockRuntime);
+    BundleToolMain.main(new String[]{"help", "not-a-command"}, mockRuntime);
 
     verify(mockRuntime, atLeastOnce()).exit(exitCode.capture());
     assertThat(exitCode.getAllValues().get(0)).isNotEqualTo(0);
@@ -74,9 +75,19 @@ public final class BundleToolMainTest {
 
   @Test
   public void testErrorReturnsExitCodeNotZero_commandDoesNotExist() {
-    BundleToolMain.main(new String[] {"not-a-command"}, mockRuntime);
+    BundleToolMain.main(new String[]{"not-a-command"}, mockRuntime);
 
     verify(mockRuntime).exit(exitCode.capture());
     assertThat(exitCode.getValue()).isNotEqualTo(0);
+  }
+
+  @Test
+  public void testBuildApkCommand() {
+    String aabPath = "/Users/zhouzhenliang/Desktop/bundletool/app-wallpaper-release.aab";
+    String outPath = "/Users/zhouzhenliang/Desktop/bundletool/out";
+    String config = "/Users/zhouzhenliang/Desktop/bundletool/config";
+    String command = "build-apks --bundle=%s --output=%s --ks=%s/release.keystore.jks --ks-pass=file:%s/keystore.pwd --ks-key-alias=arkkey0 --key-pass=file:%s/key.pwd --mode=universal --output-format=directory";
+    String[] args = String.format(command, aabPath, outPath, config, config, config).split(" ");
+    BundleToolMain.main(args, mockRuntime);
   }
 }
