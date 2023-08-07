@@ -34,6 +34,7 @@ import com.android.tools.build.bundletool.model.exceptions.CommandExecutionExcep
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CheckReturnValue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -45,9 +46,13 @@ import java.security.SignatureException;
 import java.util.Optional;
 import javax.inject.Inject;
 
-/** Signs APKs. */
+/**
+ * Signs APKs.
+ */
 class ApkSigner {
-  /** Name identifying uniquely the {@link SignerConfig}. */
+  /**
+   * Name identifying uniquely the {@link SignerConfig}.
+   */
   private static final String SIGNER_CONFIG_NAME = "BNDLTOOL";
 
   private final Optional<SigningConfigurationProvider> signingConfigProvider;
@@ -76,9 +81,9 @@ class ApkSigner {
       Path signedApkPath = tempDirectory.getPath().resolve("signed.apk");
       com.android.apksig.ApkSigner.Builder apkSigner =
           new com.android.apksig.ApkSigner.Builder(
-                  signingConfig.getSignerConfigs().stream()
-                      .map(ApkSigner::convertToApksigSignerConfig)
-                      .collect(toImmutableList()))
+              signingConfig.getSignerConfigs().stream()
+                  .map(ApkSigner::convertToApksigSignerConfig)
+                  .collect(toImmutableList()))
               .setInputApk(apkPath.toFile())
               .setOutputApk(signedApkPath.toFile())
               .setV1SigningEnabled(signingConfig.getV1SigningEnabled())
@@ -101,10 +106,10 @@ class ApkSigner {
       Files.move(signedApkPath, apkPath, REPLACE_EXISTING);
       return Optional.of(signingDescription(signingConfig));
     } catch (IOException
-        | ApkFormatException
-        | NoSuchAlgorithmException
-        | InvalidKeyException
-        | SignatureException e) {
+             | ApkFormatException
+             | NoSuchAlgorithmException
+             | InvalidKeyException
+             | SignatureException e) {
       throw CommandExecutionException.builder()
           .withCause(e)
           .withInternalMessage("Unable to sign APK.")
@@ -162,8 +167,10 @@ class ApkSigner {
 
   private static SignerConfig convertToApksigSignerConfig(
       com.android.tools.build.bundletool.model.SignerConfig signerConfig) {
+    String alias = signerConfig.getKeyAlias();
+    String name = alias.isEmpty() ? SIGNER_CONFIG_NAME : alias;
     return new SignerConfig.Builder(
-            SIGNER_CONFIG_NAME, signerConfig.getPrivateKey(), signerConfig.getCertificates())
+        name, signerConfig.getPrivateKey(), signerConfig.getCertificates())
         .build();
   }
 }

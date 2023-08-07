@@ -22,6 +22,7 @@ import com.android.tools.build.bundletool.model.exceptions.CommandExecutionExcep
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Immutable;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -39,14 +40,19 @@ import java.util.Arrays;
 import java.util.Optional;
 import javax.security.auth.DestroyFailedException;
 
-/** Configuration of a signer. */
+/**
+ * Configuration of a signer.
+ */
 @SuppressWarnings("Immutable") // PrivateKey and X509Certificate are considered immutable.
 @Immutable
 @AutoValue
 @AutoValue.CopyAnnotations
 public abstract class SignerConfig {
 
-  SignerConfig() {}
+  SignerConfig() {
+  }
+
+  public abstract String getKeyAlias();
 
   public abstract PrivateKey getPrivateKey();
 
@@ -56,13 +62,21 @@ public abstract class SignerConfig {
     return new AutoValue_SignerConfig.Builder();
   }
 
-  /** Builder of {@link SignerConfig} instances. */
+  /**
+   * Builder of {@link SignerConfig} instances.
+   */
   @AutoValue.Builder
   public abstract static class Builder {
-    /** Sets the private key to use to sign the APK. */
+    public abstract Builder setKeyAlias(String aliasName);
+
+    /**
+     * Sets the private key to use to sign the APK.
+     */
     public abstract Builder setPrivateKey(PrivateKey privateKey);
 
-    /** Sets the certificate corresponding to the private key. */
+    /**
+     * Sets the certificate corresponding to the private key.
+     */
     public abstract Builder setCertificates(ImmutableList<X509Certificate> certificates);
 
     abstract SignerConfig autoBuild();
@@ -92,11 +106,11 @@ public abstract class SignerConfig {
    * Extract the signer config (private key and certificates) associated with a key stored in a
    * keystore on disk.
    *
-   * @param keystorePath Path to the keystore on disk (JKS and PKCS12 supported).
-   * @param keyAlias Alias of the key in the keystore.
+   * @param keystorePath             Path to the keystore on disk (JKS and PKCS12 supported).
+   * @param keyAlias                 Alias of the key in the keystore.
    * @param optionalKeystorePassword Password of the keystore. If not set, user will be prompted.
-   * @param optionalKeyPassword Password of the key in the keystore. If not set, user will be
-   *     prompted.
+   * @param optionalKeyPassword      Password of the key in the keystore. If not set, user will be
+   *                                 prompted.
    */
   public static SignerConfig extractFromKeystore(
       Path keystorePath,
@@ -207,6 +221,6 @@ public abstract class SignerConfig {
     ImmutableList<X509Certificate> certificates =
         Arrays.stream(certChain).map(c -> (X509Certificate) c).collect(toImmutableList());
 
-    return SignerConfig.builder().setPrivateKey(privateKey).setCertificates(certificates).build();
+    return SignerConfig.builder().setKeyAlias(keyAlias).setPrivateKey(privateKey).setCertificates(certificates).build();
   }
 }
