@@ -83,10 +83,11 @@ public final class BundleToolMainTest {
 
   @Test
   public void testBuildApkCommand() {
-    String aabPath = "/Users/zhouzhenliang/Desktop/bundletool/app-wallpaper-release.aab";
-    String outPath = "/Users/zhouzhenliang/Desktop/bundletool/out";
-    String config = "/Users/zhouzhenliang/Desktop/bundletool/config";
-    String command = "build-apks --bundle=%s --output=%s --ks=%s/release.keystore.jks --ks-pass=file:%s/keystore.pwd --ks-key-alias=arkkey0 --key-pass=file:%s/key.pwd --mode=universal --output-format=directory";
+    String rootDir = "/Users/zhouzhenliang/Desktop/bundletool";
+    String aabPath = rootDir + "/app-filemanager-release.aab";
+    String outPath = rootDir + "/out";
+    String config = rootDir + "/config";
+    String command = "build-apks --bundle=%s --output=%s --ks=%s/release.keystore.jks --ks-pass=file:%s/keystore.pwd --ks-key-alias=key0 --key-pass=file:%s/key.pwd --mode=universal --output-format=directory";
     String[] args = String.format(command, aabPath, outPath, config, config, config).split(" ");
     BundleToolMain.main(args, mockRuntime);
   }
