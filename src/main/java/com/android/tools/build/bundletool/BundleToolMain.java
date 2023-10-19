@@ -15,31 +15,14 @@
  */
 package com.android.tools.build.bundletool;
 
-import com.android.tools.build.bundletool.commands.AddTransparencyCommand;
-import com.android.tools.build.bundletool.commands.BuildApksCommand;
-import com.android.tools.build.bundletool.commands.BuildBundleCommand;
-import com.android.tools.build.bundletool.commands.BuildSdkApksCommand;
-import com.android.tools.build.bundletool.commands.BuildSdkApksForAppCommand;
-import com.android.tools.build.bundletool.commands.BuildSdkAsarCommand;
-import com.android.tools.build.bundletool.commands.BuildSdkBundleCommand;
-import com.android.tools.build.bundletool.commands.CheckTransparencyCommand;
-import com.android.tools.build.bundletool.commands.CommandHelp;
-import com.android.tools.build.bundletool.commands.DumpCommand;
-import com.android.tools.build.bundletool.commands.EvaluateDeviceTargetingConfigCommand;
-import com.android.tools.build.bundletool.commands.ExtractApksCommand;
-import com.android.tools.build.bundletool.commands.GetDeviceSpecCommand;
-import com.android.tools.build.bundletool.commands.GetSizeCommand;
-import com.android.tools.build.bundletool.commands.InstallApksCommand;
-import com.android.tools.build.bundletool.commands.InstallMultiApksCommand;
-import com.android.tools.build.bundletool.commands.PrintDeviceTargetingConfigCommand;
-import com.android.tools.build.bundletool.commands.ValidateBundleCommand;
-import com.android.tools.build.bundletool.commands.VersionCommand;
+import com.android.tools.build.bundletool.commands.*;
 import com.android.tools.build.bundletool.device.AdbServer;
 import com.android.tools.build.bundletool.device.DdmlibAdbServer;
 import com.android.tools.build.bundletool.flags.FlagParser;
 import com.android.tools.build.bundletool.flags.ParsedFlags;
 import com.android.tools.build.bundletool.model.version.BundleToolVersion;
 import com.google.common.collect.ImmutableList;
+
 import java.util.Optional;
 
 /**
@@ -55,7 +38,9 @@ public class BundleToolMain {
     main(args, Runtime.getRuntime());
   }
 
-  /** Parses the flags and routes to the appropriate command handler. */
+  /**
+   * Parses the flags and routes to the appropriate command handler.
+   */
   static void main(String[] args, Runtime runtime) {
     final ParsedFlags flags;
     try {
@@ -117,6 +102,11 @@ public class BundleToolMain {
             InstallApksCommand.fromFlags(flags, adbServer).execute();
           }
           break;
+        case InstallXapkCommand.COMMAND_NAME:
+          try (AdbServer adbServer = DdmlibAdbServer.getInstance()) {
+            InstallXapkCommand.fromFlags(flags, adbServer).execute();
+          }
+          break;
         case InstallMultiApksCommand.COMMAND_NAME:
           try (AdbServer adbServer = DdmlibAdbServer.getInstance()) {
             InstallMultiApksCommand.fromFlags(flags, adbServer).execute();
@@ -158,7 +148,6 @@ public class BundleToolMain {
     } catch (Exception e) {
       System.err.println(
           "[BT:" + BundleToolVersion.getCurrentVersion() + "] Error: " + e.getMessage());
-      e.printStackTrace();
       runtime.exit(1);
       return;
     }
@@ -167,7 +156,9 @@ public class BundleToolMain {
     runtime.exit(0);
   }
 
-  /** Displays a general help. */
+  /**
+   * Displays a general help.
+   */
   public static void help() {
     ImmutableList<CommandHelp> commandHelps =
         ImmutableList.of(
@@ -183,6 +174,7 @@ public class BundleToolMain {
             GetDeviceSpecCommand.help(),
             InstallApksCommand.help(),
             InstallMultiApksCommand.help(),
+            InstallXapkCommand.help(),
             ValidateBundleCommand.help(),
             DumpCommand.help(),
             GetSizeCommand.help(),
@@ -195,7 +187,9 @@ public class BundleToolMain {
     commandHelps.forEach(commandHelp -> commandHelp.printSummary(System.out));
   }
 
-  /** Displays help about a given command. */
+  /**
+   * Displays help about a given command.
+   */
   public static void help(String commandName, Runtime runtime) {
     CommandHelp commandHelp;
     switch (commandName) {
@@ -234,6 +228,9 @@ public class BundleToolMain {
         break;
       case InstallMultiApksCommand.COMMAND_NAME:
         commandHelp = InstallMultiApksCommand.help();
+        break;
+      case InstallXapkCommand.COMMAND_NAME:
+        commandHelp = InstallXapkCommand.help();
         break;
       case ValidateBundleCommand.COMMAND_NAME:
         commandHelp = ValidateBundleCommand.help();

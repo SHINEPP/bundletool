@@ -91,4 +91,22 @@ public final class BundleToolMainTest {
     String[] args = String.format(command, aabPath, outPath, config, config, config).split(" ");
     BundleToolMain.main(args, mockRuntime);
   }
+
+  @Test
+  public void testInstallApkCommand() {
+    String rootDir = "/Users/zhouzhenliang/Desktop/www";
+    String apksPath = rootDir + "/wallpaper.apks";
+    String command = "install-apks --apks=%s";
+    String[] args = String.format(command, apksPath).split(" ");
+    BundleToolMain.main(args, mockRuntime);
+  }
+
+  @Test
+  public void testInstallXapkCommand() {
+    String rootDir = "/Users/zhouzhenliang/Desktop/www";
+    String apksPath = rootDir + "/DollarQuiz.xapk";
+    String command = "install-xapk --xapk=%s";
+    String[] args = String.format(command, apksPath).split(" ");
+    BundleToolMain.main(args, mockRuntime);
+  }
 }
